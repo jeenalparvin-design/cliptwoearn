@@ -1,422 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Watch & Earn · Telegram Mini App</title>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
-    <!-- ✅ FIXED: explicit https:// and preconnect for faster load -->
-    <link rel="preconnect" href="https://libtl.com" crossorigin>
-    <script src="https://libtl.com/sdk.js" data-zone="11856479" data-sdk="show_11856479"></script>
+  <!-- Telegram Mini App -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box;
-            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
+  <!-- Monetag -->
+  <script
+    src="//libtl.com/sdk.js"
+    data-zone="11856479"
+    data-sdk="show_11856479">
+  </script>
 
-        body {
-            background: linear-gradient(145deg, #0b1120 0%, #19233c 100%);
-            min-height: 100vh; display: flex; align-items: center;
-            justify-content: center; padding: 12px; color: #eef2ff;
-        }
+  <title>My Telegram Mini App</title>
 
-        .app-card {
-            max-width: 480px; width: 100%;
-            background: rgba(18, 26, 40, 0.9);
-            backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
-            border-radius: 48px; padding: 24px 20px 30px;
-            box-shadow: 0 25px 50px -8px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
-            border: 1px solid rgba(88,166,255,0.2);
-        }
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 30px 15px;
+    }
 
-        .header { display: flex; align-items: center; gap: 12px; margin-bottom: 28px; padding: 0 6px; }
-        .avatar {
-            background: linear-gradient(135deg, #2b7aff, #1a4fd6);
-            width: 54px; height: 54px; border-radius: 18px;
-            display: flex; align-items: center; justify-content: center;
-            font-size: 28px; box-shadow: 0 10px 18px -5px #2b7aff70;
-        }
-        .user-info h1 {
-            font-size: 1.6rem; font-weight: 700; letter-spacing: -0.02em;
-            background: linear-gradient(120deg, #ffffff, #b9d4ff);
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        .user-info .badge {
-            font-size: 0.75rem; background: rgba(43,122,255,0.25);
-            padding: 4px 10px; border-radius: 100px; color: #8bb4ff;
-            border: 1px solid #2b7aff60; display: inline-block;
-            margin-top: 4px; font-weight: 500;
-        }
+    #adButton {
+      padding: 14px 24px;
+      border: 0;
+      border-radius: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
 
-        .balance-panel {
-            background: linear-gradient(135deg, #0d1a2e, #0a1322);
-            border-radius: 32px; padding: 24px 22px; margin-bottom: 28px;
-            border: 1px solid #2e3f5e;
-            box-shadow: inset 0 2px 8px #00000040, 0 8px 18px #00000030;
-            display: flex; align-items: center; justify-content: space-between;
-        }
-        .balance-label {
-            font-size: 0.9rem; text-transform: uppercase;
-            letter-spacing: 1px; color: #8da3c7; font-weight: 500;
-        }
-        .balance-value { display: flex; align-items: center; gap: 10px; }
-        .balance-value span:first-child {
-            font-size: 2.4rem; font-weight: 800;
-            background: linear-gradient(to right, #ffe27a, #ffb347);
-            -webkit-background-clip: text; background-clip: text;
-            -webkit-text-fill-color: transparent; line-height: 1;
-        }
-        .balance-value .star { font-size: 2.2rem; filter: drop-shadow(0 0 12px #ffb34780); }
-
-        .earn-section { display: flex; flex-direction: column; gap: 14px; margin-bottom: 24px; }
-
-        .ad-btn {
-            background: linear-gradient(135deg, #1f3a6b, #122b4f);
-            border: 1px solid #3f6bb0; border-radius: 100px;
-            padding: 18px; display: flex; align-items: center;
-            justify-content: space-between; cursor: pointer;
-            transition: all 0.15s ease; color: #ffffff;
-            font-weight: 600; font-size: 1.1rem;
-            box-shadow: 0 10px 20px -8px #00000080, 0 0 0 1px #2b5aa0 inset;
-        }
-        .ad-btn:active:not(:disabled) {
-            transform: scale(0.97);
-            background: linear-gradient(135deg, #1b3360, #0e2342);
-        }
-        .ad-btn:disabled {
-            opacity: 0.45; cursor: not-allowed; filter: grayscale(0.5);
-        }
-
-        .ad-btn.rewarded { background: linear-gradient(135deg, #1f4a3a, #0d3325); border-color: #2e9e6b; }
-        .ad-btn.popup    { background: linear-gradient(135deg, #543b7a, #2e1e4a); border-color: #9a6eff; }
-
-        .ad-btn .left { display: flex; align-items: center; gap: 12px; }
-        .ad-icon { font-size: 1.7rem; line-height: 1; }
-        .ad-tag {
-            font-size: 0.7rem; background: #ffffff20;
-            padding: 4px 10px; border-radius: 40px;
-            font-weight: 400; color: #b8d0ff;
-        }
-
-        .inapp-info {
-            font-size: 0.8rem; color: #90a6cc; background: #111e30;
-            padding: 12px 18px; border-radius: 100px;
-            display: flex; align-items: center; justify-content: space-between;
-            border: 1px solid #253e5e; margin-top: 4px;
-        }
-        .inapp-info span:last-child {
-            background: #1d3855; padding: 4px 12px;
-            border-radius: 40px; font-weight: 600; color: #b3d0ff;
-        }
-
-        .status-message {
-            margin-top: 16px; font-size: 0.9rem; text-align: center;
-            color: #6f8bb0; min-height: 24px; padding: 8px 0;
-            border-top: 1px solid #1d2b40; transition: color 0.3s;
-        }
-        .status-message.ok    { color: #6fdc9b; }
-        .status-message.error { color: #ff8a8a; }
-
-        .toast {
-            position: fixed; bottom: 30px; left: 50%;
-            transform: translateX(-50%) translateY(20px);
-            background: #0f1e30ee; backdrop-filter: blur(12px);
-            color: #e0edff; padding: 14px 28px; border-radius: 60px;
-            border: 1px solid #2f6fd0; font-weight: 500; opacity: 0;
-            transition: opacity 0.25s, transform 0.25s;
-            pointer-events: none; z-index: 9999;
-            box-shadow: 0 20px 40px -10px black;
-            white-space: nowrap; font-size: 0.95rem;
-        }
-        .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-        .footer-note {
-            display: flex; justify-content: center; gap: 16px;
-            font-size: 0.7rem; color: #435e7c; margin-top: 18px;
-        }
-
-        /* SDK loading indicator */
-        .sdk-status {
-            display: flex; align-items: center; gap: 8px;
-            font-size: 0.75rem; color: #8da3c7;
-            justify-content: center; margin-bottom: 12px;
-        }
-        .sdk-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #ffb347; animation: pulse 1.2s infinite;
-        }
-        .sdk-dot.ready { background: #6fdc9b; animation: none; }
-        .sdk-dot.error { background: #ff6b6b; animation: none; }
-        @keyframes pulse {
-            0%,100% { opacity: 0.4; transform: scale(0.9); }
-            50%     { opacity: 1;   transform: scale(1.2); }
-        }
-    </style>
+    #status {
+      margin-top: 15px;
+    }
+  </style>
 </head>
+
 <body>
-    <div class="app-card">
-        <div class="header">
-            <div class="avatar">🎯</div>
-            <div class="user-info">
-                <h1>Watch & Earn</h1>
-                <div class="badge">Telegram Mini App</div>
-            </div>
-        </div>
 
-        <!-- SDK loading indicator -->
-        <div class="sdk-status">
-            <span class="sdk-dot" id="sdkDot"></span>
-            <span id="sdkText">Connecting to ad network…</span>
-        </div>
+  <h2>🎁 Watch Ad</h2>
 
-        <div class="balance-panel">
-            <div class="balance-label">YOUR BALANCE</div>
-            <div class="balance-value">
-                <span id="balanceDisplay">0</span>
-                <span class="star">⭐</span>
-            </div>
-        </div>
+  <button id="adButton">
+    Watch Ad
+  </button>
 
-        <div class="earn-section">
-            <button class="ad-btn rewarded" id="btnInterstitial" disabled>
-                <div class="left">
-                    <span class="ad-icon">🎬</span>
-                    <span>Watch Ad</span>
-                </div>
-                <span class="ad-tag">+1 ⭐</span>
-            </button>
+  <div id="status"></div>
 
-            <button class="ad-btn popup" id="btnPopup" disabled>
-                <div class="left">
-                    <span class="ad-icon">✨</span>
-                    <span>Popup Reward</span>
-                </div>
-                <span class="ad-tag">+2 ⭐</span>
-            </button>
+  <script>
+    // Telegram Mini App
+    const tg = window.Telegram?.WebApp;
 
-            <div class="inapp-info">
-                <span>📱 In-App Interstitial</span>
-                <span>auto · 2 ads / 6min</span>
-            </div>
-        </div>
+    if (tg) {
+      tg.ready();
+      tg.expand();
+    }
 
-        <div class="status-message" id="statusMsg">Initializing ad SDK…</div>
-        <div class="footer-note">
-            <span>⚡ powered by libtl</span>
-            <span>•</span>
-            <span>zone 11856479</span>
-        </div>
-    </div>
+    const button = document.getElementById("adButton");
+    const status = document.getElementById("status");
 
-    <div class="toast" id="toast">+1 ⭐ earned!</div>
+    button.addEventListener("click", async function () {
 
-    <script>
-    (function () {
-        'use strict';
+      button.disabled = true;
+      status.textContent = "Opening ad...";
 
-        // ---------- DOM ----------
-        const balanceDisplay = document.getElementById('balanceDisplay');
-        const statusMsg      = document.getElementById('statusMsg');
-        const toastEl        = document.getElementById('toast');
-        const btnInterstitial = document.getElementById('btnInterstitial');
-        const btnPopup        = document.getElementById('btnPopup');
-        const sdkDot          = document.getElementById('sdkDot');
-        const sdkText         = document.getElementById('sdkText');
+      try {
 
-        // ---------- STATE ----------
-        let userStars = 0;
-        let sdkReady  = false;
-
-        // ---------- UI HELPERS ----------
-        function updateBalanceUI() {
-            balanceDisplay.textContent = userStars;
+        if (typeof show_11856479 !== "function") {
+          throw new Error("Monetag SDK is not loaded yet.");
         }
 
-        function setStatus(text, type) {
-            statusMsg.textContent = text;
-            statusMsg.className = 'status-message' + (type ? ' ' + type : '');
-        }
-
-        function showToast(text, isGood = true) {
-            toastEl.textContent = text;
-            toastEl.style.borderColor = isGood ? '#2f6fd0' : '#b04545';
-            toastEl.classList.add('show');
-            clearTimeout(showToast._t);
-            showToast._t = setTimeout(() => toastEl.classList.remove('show'), 2200);
-        }
-
-        function setSdkIndicator(state, text) {
-            sdkDot.className = 'sdk-dot' + (state ? ' ' + state : '');
-            sdkText.textContent = text;
-        }
-
-        function setButtonsEnabled(enabled) {
-            btnInterstitial.disabled = !enabled;
-            btnPopup.disabled        = !enabled;
-        }
-
-        // ---------- REWARD ----------
-        function rewardUser(amount = 1, source = '') {
-            userStars += amount;
-            updateBalanceUI();
-            showToast(`+${amount} ⭐ ${source}`.trim(), true);
-            setStatus(`🎉 +${amount} star${amount > 1 ? 's' : ''} added!`, 'ok');
-        }
-
-        // ---------- SDK READY DETECTION ----------
-        // The SDK creates window.show_11856479 asynchronously.
-        // We poll until it appears (max ~15 seconds), then enable buttons.
-        function waitForSdk(maxWaitMs = 15000) {
-            const start = Date.now();
-            const poll = setInterval(() => {
-                // Case 1: SDK ready
-                if (typeof window.show_11856479 === 'function') {
-                    clearInterval(poll);
-                    sdkReady = true;
-                    setSdkIndicator('ready', '✅ Ad SDK ready');
-                    setButtonsEnabled(true);
-                    setStatus('Tap an ad button to earn stars', 'ok');
-                    initInAppInterstitial();
-                    console.log('[SDK] show_11856479 is ready.');
-                    return;
-                }
-                // Case 2: Timed out
-                if (Date.now() - start > maxWaitMs) {
-                    clearInterval(poll);
-                    setSdkIndicator('error', '❌ Ad SDK failed to load');
-                    setStatus('Ad SDK failed to load. Check network / blockers.', 'error');
-                    console.error('[SDK] Timed out waiting for show_11856479. ' +
-                        'The script https://libtl.com/sdk.js may be blocked, ' +
-                        'or the zone/sdk ID is invalid.');
-                    // Dev fallback: provide a stub so buttons still "work" for testing UI
-                    installFallbackStub();
-                }
-            }, 200);
-        }
-
-        // ---------- FALLBACK (only if SDK never loads) ----------
-        // Lets you test the UI without the real SDK. In production, remove or keep silent.
-        function installFallbackStub() {
-            if (typeof window.show_11856479 === 'function') return;
-            console.warn('[SDK] Installing fallback stub — for UI testing only.');
-            window.show_11856479 = function (opts) {
-                return new Promise((resolve) => {
-                    if (opts && opts.type === 'inApp') {
-                        // In-app is a no-op in fallback
-                        resolve();
-                        return;
-                    }
-                    // Simulate a short ad delay then resolve
-                    setTimeout(resolve, 1500);
-                });
-            };
-            // Enable buttons with the stub
-            sdkReady = true;
-            setSdkIndicator('error', '⚠️ Using offline stub (SDK blocked)');
-            setButtonsEnabled(true);
-            setStatus('SDK blocked — using offline demo mode', 'error');
-            initInAppInterstitial();
-        }
-
-        // ---------- IN-APP INTERSTITIAL (auto) ----------
-        function initInAppInterstitial() {
-            if (typeof window.show_11856479 !== 'function') return;
-            try {
-                window.show_11856479({
-                    type: 'inApp',
-                    inAppSettings: {
-                        frequency: 2,
-                        capping: 0.1,
-                        interval: 30,
-                        timeout: 5,
-                        everyPage: false
-                    }
-                });
-                console.log('[SDK] In-App Interstitial initialized.');
-            } catch (e) {
-                console.warn('[SDK] InApp init error:', e);
-            }
-        }
-
-        // ---------- BUTTON HANDLERS ----------
-        btnInterstitial.addEventListener('click', function () {
-            if (!sdkReady || typeof window.show_11856479 !== 'function') {
-                showToast('Ad SDK not ready', false);
-                return;
-            }
-            setStatus('Loading rewarded interstitial…');
-            setButtonsEnabled(false);
-
-            window.show_11856479()
-                .then(() => {
-                    // ✅ user reward function — runs after ad watched
-                    rewardUser(1, 'from interstitial!');
-                })
-                .catch((e) => {
-                    console.warn('Interstitial error / closed early:', e);
-                    setStatus('⚠️ Ad not completed. No reward.', 'error');
-                    showToast('Ad not finished', false);
-                })
-                .finally(() => {
-                    setButtonsEnabled(true);
-                });
+        await show_11856479({
+          type: "pop",
+          requestVar: "telegram_mini_app"
         });
 
-        btnPopup.addEventListener('click', function () {
-            if (!sdkReady || typeof window.show_11856479 !== 'function') {
-                showToast('Ad SDK not ready', false);
-                return;
-            }
-            setStatus('Opening rewarded popup…');
-            setButtonsEnabled(false);
+        status.textContent = "Ad completed.";
 
-            window.show_11856479('pop')
-                .then(() => {
-                    // ✅ user watched ad till the end or closed it in interstitial format
-                    rewardUser(2, 'from popup!');
-                })
-                .catch((e) => {
-                    console.warn('Popup error / closed early:', e);
-                    setStatus('⚠️ Popup not completed. No reward.', 'error');
-                    showToast('Popup cancelled', false);
-                })
-                .finally(() => {
-                    setButtonsEnabled(true);
-                });
-        });
+      } catch (error) {
 
-        // ---------- INIT ----------
-        updateBalanceUI();
-        setStatus('Initializing ad SDK…');
+        console.error("Monetag error:", error);
 
-        // Expose for debugging
-        window.rewardUser = rewardUser;
+        status.textContent =
+          "Ad is unavailable right now.";
 
-        // Telegram WebApp boot
-        if (window.Telegram?.WebApp) {
-            try {
-                Telegram.WebApp.ready();
-                Telegram.WebApp.expand();
-            } catch (e) { /* ignore */ }
-        }
+      } finally {
 
-        // Wait for SDK (handles slow networks + blocked scripts)
-        waitForSdk(15000);
+        button.disabled = false;
 
-        // Also listen for a possible onload event from the SDK script tag (extra safety)
-        window.addEventListener('load', () => {
-            // Give it a tiny delay in case the SDK attaches after window.load
-            setTimeout(() => {
-                if (!sdkReady && typeof window.show_11856479 === 'function') {
-                    sdkReady = true;
-                    setSdkIndicator('ready', '✅ Ad SDK ready');
-                    setButtonsEnabled(true);
-                    setStatus('Tap an ad button to earn stars', 'ok');
-                    initInAppInterstitial();
-                }
-            }, 500);
-        });
-    })();
-    </script>
+      }
+    });
+  </script>
+
 </body>
 </html>
